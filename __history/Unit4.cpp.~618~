@@ -1,0 +1,271 @@
+// ---------------------------------------------------------------------------
+
+#include <vcl.h>
+#pragma hdrstop
+
+#include "Unit4.h"
+// ---------------------------------------------------------------------------
+#pragma package(smart_init)
+#pragma resource "*.dfm"
+TForm4 *Form4;
+float box = 0;
+float sht = 0;
+float fas = 0;
+bool CheckCreatGrid = false;
+TStringGrid *StringGrid;
+TCheckBox *check;
+Variant App, Bks, Bk, Sht, Shts, Cll;
+
+// ---------------------------------------------------------------------------
+__fastcall TForm4::TForm4(TComponent* Owner) : TForm(Owner) {
+}
+
+// ---------------------------------------------------------------------------
+void __fastcall TForm4::Button1Click(TObject *Sender) {
+	if (od->Execute()) {
+		Edit1->Text = od->FileName;
+		Button2->Enabled = true;
+	}
+	else {
+		ShowMessage("Файл не выбран.");
+	}
+
+}
+
+// ---------------------------------------------------------------------------
+void __fastcall TForm4::Button2Click(TObject *Sender) {
+	Button1->Enabled = false;
+	Button2->Enabled = false;
+	Label1->Caption = "Читаем файл.";
+	// App- приложение, , Bk-Книга,  Sht- Лист, Cll - ячейка
+	App = CreateOleObject("Excel.Application");
+	App.OlePropertySet("Visible", false);
+	// Устанавливаем видимость окна в true или false.
+	Bk = App.OlePropertyGet("Workbooks").OlePropertyGet("Open",
+		WideString(od->FileName));
+	// Открываем  книгу и снимаем защиту.  |,0,FALSE,1,"","1488",FALSE|
+	Sht = Bk.OlePropertyGet("Worksheets", 1);
+	// Открываем нужную страницу книги. В данном случае 1.
+	if (CheckCreatGrid == false) {
+		StringGrid = new TStringGrid(Form4);
+		// Динамически создаем компонент на форме.
+		StringGrid->Parent = Panel2;
+		StringGrid->FixedCols = 0;
+		StringGrid->FixedRows = 1;
+		StringGrid->Height = 360;
+		StringGrid->Name = "StringGrid";
+		StringGrid->ScrollBars = ssVertical;
+		Panel2->Height = Panel2->Height + StringGrid->Height;
+		Form4->Height = Form4->Height + StringGrid->Height;
+		CheckCreatGrid = true;
+	}
+
+	int CountRow = 0, CountCol = 0, WriteCountCol = 0, WriteCountRow = 1;
+
+	if (CheckBox1->Checked == true)
+	{ // Проверка на включеный режим автозаполнения
+		CountCol = Sht.OlePropertyGet("UsedRange").OlePropertyGet("Columns")
+			.OlePropertyGet("Count");
+		// Определяем последний активный столбец таблицы EXEL.
+		CountRow = Sht.OlePropertyGet("UsedRange").OlePropertyGet("Rows")
+			.OlePropertyGet("Count");
+	}
+	else {
+		CountCol = StrToInt(ColMaskEdit->Text);
+		CountRow = StrToInt(RowMaskEdit->Text);
+	}
+	// Определяем последнюю активную строку таблицы EXEL.
+	// У автоматического определения размеров таблицы есть минус, размер
+	// активной зоны может быть больше таблицы с данными.
+
+	for (int i = 1; i <= CountRow; i++) {
+		for (int j = 1; j <= CountCol; j++) {
+			if (j == 1) {
+				WriteCountCol = 1;
+				// Отдельная переменная, ведущая счет заполненых ячеек в столбцах.
+				// Сбрасывается при начали новой итерации по столбцам.
+				if (VarToStr(Sht.OlePropertyGet("Cells", i,
+					StrToInt(SelectColMaskEdit->Text))).Length() > 1) {
+					StringGrid->RowCount = WriteCountRow++;
+				}
+			}
+			if (VarToStr(Sht.OlePropertyGet("Cells", 2, j)).Length() != 0)
+			{ // Что бы не плодить новых переменных, использую преобразование VarToStr (Variant to String), проверяю на длину строки. Если длина равна 0, значит ячейка пустая.
+				if (i == 1)
+				{ // Колхозно, но пока не придумал как сделать уникальное условие. Проверяем номер строки, если 1, тогда накладываем чек боксы на шапку таблицы.
+					check = new TCheckBox(Panel2);
+					check->Parent = Panel2;
+					check->Name = "check" + IntToStr(WriteCountCol);
+					check->Width = 10;
+
+					if (WriteCountCol > 1) {
+						check->Left = 30 + (65 * (WriteCountCol - 1));
+					}
+					else {
+						check->Left = 30;
+					}
+					check->Top = 5;
+					check->Tag = WriteCountCol;
+					check->OnClick = CheckCells;
+					StringGrid->Objects[WriteCountCol][i] =
+						dynamic_cast<TCheckBox*>
+						(FindComponent("check" + IntToStr(WriteCountCol)));
+
+					StringGrid->ColCount = WriteCountCol;
+					StringGrid->Width = StringGrid->ColCount * 78;
+					Panel2->Width = StringGrid->Width;
+					Form4->Width = Panel2->Width + 50;
+				}
+
+				if ((VarToStr(Sht.OlePropertyGet("Cells", i,
+					StrToInt(SelectColMaskEdit->Text))).Length() > 1)) {
+
+					StringGrid->Cells[WriteCountCol - 1][WriteCountRow - 1] =
+						VarToStr(Sht.OlePropertyGet("Cells", i, j));
+					// Приводим значение ячейки EXEl к строке, что бы не было ошибок при записи. Избавляет от try catch.
+				}
+				WriteCountCol++;
+			}
+		}
+		Application->ProcessMessages();
+	}
+	StringGrid->RowCount++;
+	App.OleProcedure("Quit");
+	Label1->Caption = "Закончили чтение. Строим таблицу.";
+	Button3->Enabled = true;
+}
+
+// ---------------------------------------------------------------------------
+void __fastcall TForm4::FormResize(TObject * Sender) {
+	// this->Width = 425;
+	// this->Height = 159;
+}
+
+// ---------------------------------------------------------------------------
+void __fastcall TForm4::N3Click(TObject * Sender) {
+	Application->Terminate();
+}
+// ---------------------------------------------------------------------------
+
+void __fastcall TForm4::N5Click(TObject * Sender) {
+	ShowMessage("Пока ничего не придумал.");
+}
+// ---------------------------------------------------------------------------
+
+void __fastcall TForm4::CheckCells(TObject * Sender) {
+	// ShowMessage(((TCheckBox*)Sender)->Name);
+}
+
+// ---------------------------------------------------------------------------
+
+void __fastcall TForm4::CheckBox1Click(TObject * Sender) {
+	if (CheckBox1->Checked == true) {
+		ColMaskEdit->Enabled = false;
+		RowMaskEdit->Enabled = false;
+	}
+	else {
+		ColMaskEdit->Enabled = true;
+		RowMaskEdit->Enabled = true;
+	}
+}
+
+// ---------------------------------------------------------------------------
+void __fastcall TForm4::Button3Click(TObject *Sender) {
+	int CountCol = 1; // Переменная для выбранных столбцов.
+	App = CreateOleObject("Excel.Application");
+	App.OlePropertySet("Visible", false);
+	// Устанавливаем видимость окна в true или false.
+	Bks = App.OlePropertyGet("Workbooks"); // Открываем  книгу.
+	App.OlePropertySet("SheetsInNewWorkbook", 1);
+	Bks.OleProcedure("Add");
+	Bk = Bks.OlePropertyGet("Item", 1);
+	Shts = Bk.OlePropertyGet("Worksheets");
+	Sht = Shts.OlePropertyGet("Item", 1);
+	Label1->Caption = "Пишем в новый файл.";
+
+	for (int i = 1; i <= StringGrid->RowCount; i++) {
+		for (int j = 1; j <= StringGrid->ColCount; j++) {
+
+			if (j == 1) {
+				CountCol = 1;
+			}
+			// Ниже поиск компонента по имени в масиве компонентов.
+			// Важно, искать нужно у родителя в массиве.
+			// После проверка на установленный флаг
+			if (dynamic_cast<TCheckBox*>(Panel2->FindComponent("check" +
+				IntToStr(j)))->Checked == true) {
+				Cll = Sht.OlePropertyGet("Cells").OlePropertyGet("Item", i,
+					CountCol++);
+				Cll.OlePropertySet("WrapText", true); // перенос по словам
+				Cll.OlePropertySet("Value",
+					WideString(StringGrid->Cells[j - 1][i - 1]));
+			}
+		}
+	}
+
+	/* // Cll.OlePropertySet("RowHeight", 20);
+	 Cll.OlePropertySet("ColumnWidth", 15);
+	 Cll.OlePropertySet("WrapText", true); // перенос по словам
+
+	 if (table[2][j] == "Артикул") {
+	 Cll.OlePropertySet("ColumnWidth", 20);
+	 }
+	 if (table[2][j] == "Название") {
+	 Cll.OlePropertySet("ColumnWidth", 35);
+	 }
+	 if ((i > 2) && (j == 9)) {
+
+	 try {
+	 if (table[i][9] != "") {
+	 box = StrToFloat(table[i][9]);
+	 sht = StrToFloat(table[i][11]);
+	 fas = StrToFloat(table[i][5]);
+	 box = box + ceil(sht / fas);
+	 table[i][9] = FloatToStr(box);
+	 box = 0;
+	 sht = 0;
+	 fas = 0;
+	 }
+	 }
+	 catch (...) {
+	 box = box;
+	 }
+
+	 }
+	 Cll.OlePropertySet("HorizontalAlignment", -4108);
+	 Cll.OlePropertySet("VerticalAlignment", -4108);
+
+	 Cll.OlePropertySet("Value", WideString(table[i][j]));
+	 col++;
+	 }
+	 }
+
+	 Application->ProcessMessages();
+	 }
+	 allcol = col;
+	 col = 1;
+	 if ((table[i][11] != "") || (table[i][9] != "")) {
+	 row++;
+	 }
+	 Application->ProcessMessages();
+	 }
+	/* Cll = Sht.OlePropertyGet("Cells").OlePropertyGet("Item", 1, 5);
+	 Cll.OlePropertySet("Value", WideString("Сумма заказа: " + table[2][16]));
+	 Cll = Sht.OlePropertyGet("Cells").OlePropertyGet("Item", 1, allcol);
+	 Cll.OlePropertyGet("Cells", 1, allcol).OlePropertySet("NumberFormat",
+	 (L"_-* #,##0 [$?-ru-RU]_-;-* #,##0 [$?-ru-RU]_-;_-* " "-"
+	 " [$?-ru-RU]_-;_-@_-")); */
+
+	// Cll.OlePropertySet("Value", WideString("Сумма" + table[1][jj]));
+	App.OlePropertySet("Visible", true);
+
+	App.OlePropertyGet("Workbooks").OlePropertyGet("Item", 1).OleProcedure
+		("SaveAs", WideString(ExtractFilePath(od->FileName) + "reform_" + ExtractFileName
+		(od->FileName)));
+
+	// App.OleProcedure("Quit");
+	Label1->Caption = "Готово.";
+	Button1->Enabled = true;
+	Button2->Enabled = false;
+}
+// ---------------------------------------------------------------------------

@@ -1,0 +1,20 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<BorlandProject>
+	<Transactions>
+    <Transaction>1899.12.30 00:00:00.000.032,=C:\Users\Александр\Documents\Embarcadero\Studio\Projects\Unit5.cpp</Transaction>
+    <Transaction>1899.12.30 00:00:00.000.224,=C:\Users\Александр\Documents\Embarcadero\Studio\Projects\Project4PCH1.h</Transaction>
+    <Transaction>1899.12.30 00:00:00.000.951,C:\Users\Александр\Documents\Embarcadero\Studio\Projects\Unit4.h=C:\Users\Александр\Documents\Embarcadero\Studio\Projects\Прайс\Unit4.h</Transaction>
+    <Transaction>1899.12.30 00:00:00.000.441,C:\Users\Александр\Documents\Embarcadero\Studio\Projects\Unit5.cpp=</Transaction>
+    <Transaction>1899.12.30 00:00:00.000.147,C:\Users\Александр\Documents\Embarcadero\Studio\Projects\Project4.cbproj=C:\Users\Александр\Documents\Embarcadero\Studio\Projects\SV_Price.cbproj</Transaction>
+    <Transaction>1899.12.30 00:00:00.000.098,C:\Users\Александр\Documents\Embarcadero\Studio\Projects\Project4.cbproj=C:\Users\Александр\Documents\Embarcadero\Studio\Projects\Project4.cbproj</Transaction>
+    <Transaction>1899.12.30 00:00:00.000.438,=C:\Users\Александр\Documents\Embarcadero\Studio\Projects\Unit5.cpp</Transaction>
+    <Transaction>1899.12.30 00:00:00.000.125,C:\Users\Александр\Documents\Embarcadero\Studio\Projects\Project4PCH2.h=C:\Users\Александр\Documents\Embarcadero\Studio\Projects\SV_PricePCH1.h</Transaction>
+    <Transaction>1899.12.30 00:00:00.000.951,C:\Users\Александр\Documents\Embarcadero\Studio\Projects\Unit4.cpp=C:\Users\Александр\Documents\Embarcadero\Studio\Projects\Прайс\Unit4.cpp</Transaction>
+    <Transaction>1899.12.30 00:00:00.000.714,=C:\Users\Александр\Documents\Embarcadero\Studio\Projects\Unit4.cpp</Transaction>
+    <Transaction>1899.12.30 00:00:00.000.951,C:\Users\Александр\Documents\Embarcadero\Studio\Projects\Unit4.dfm=C:\Users\Александр\Documents\Embarcadero\Studio\Projects\Прайс\Unit4.dfm</Transaction>
+    <Transaction>1899.12.30 00:00:00.000.263,=C:\Users\Александр\Documents\Embarcadero\Studio\Projects\Unit4.cpp</Transaction>
+    <Transaction>1899.12.30 00:00:00.000.668,=C:\Users\Александр\Documents\Embarcadero\Studio\Projects\Project4PCH2.h</Transaction>
+    <Transaction>1899.12.30 00:00:00.000.630,C:\Users\Александр\Documents\Embarcadero\Studio\Projects\SV_PricePCH1.h=C:\Users\Александр\Documents\Embarcadero\Studio\Projects\Прайс\SV_PricePCH1.h</Transaction>
+    <Transaction>1899.12.30 00:00:00.000.861,C:\Users\Александр\Documents\Embarcadero\Studio\Projects\SV_Price.cbproj=C:\Users\Александр\Documents\Embarcadero\Studio\Projects\Прайс\SV_Price.cbproj</Transaction>
+  </Transactions>
+</BorlandProject>
